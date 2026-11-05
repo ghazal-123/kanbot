@@ -2,8 +2,13 @@ import axios from 'axios'
 
 export const TOKEN_STORAGE_KEY = 'kanbot_token'
 
+const configuredApiUrl = import.meta.env.VITE_API_URL
+  ?.trim()
+  .replace(/\/+$/, '')
+  .replace(/\/api$/i, '')
+
 export const api = axios.create({
-baseURL: import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : "http://localhost:4000/api",
+  baseURL: configuredApiUrl ? `${configuredApiUrl}/api` : 'http://localhost:4000/api',
   headers: { 'Content-Type': 'application/json' },
 })
 
