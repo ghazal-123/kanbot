@@ -16,6 +16,8 @@ import ViewKanbanOutlinedIcon from '@mui/icons-material/ViewKanbanOutlined'
 import PlaylistAddCheckOutlinedIcon from '@mui/icons-material/PlaylistAddCheckOutlined'
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined'
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined'
+import MenuOpenOutlinedIcon from '@mui/icons-material/MenuOpenOutlined'
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import { fetchProjects } from '../api/kanbot'
 import { getApiErrorMessage } from '../api/client'
 import useAuth from '../context/useAuth'
@@ -44,6 +46,7 @@ export default function AppShell() {
   const [projectError, setProjectError] = useState('')
   const [assistantOpen, setAssistantOpen] = useState(false)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -77,15 +80,39 @@ export default function AppShell() {
 
   function changeProject(event) {
     const selectedId = event.target.value
-    if (selectedId) navigate(`/projects/${selectedId}/backlog`)
+    if (selectedId) {
+      navigate(`/projects/${selectedId}/backlog`)
+      setMobileNavOpen(false)
+    }
+  }
+
+  function toggleSidebar() {
+    if (window.matchMedia('(max-width: 768px)').matches) {
+      setMobileNavOpen((open) => !open)
+      return
+    }
+    setSidebarCollapsed((collapsed) => !collapsed)
   }
 
   return (
-    <div className="app-shell min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-[#0B1329] dark:text-white">
+    <div className={`app-shell ${sidebarCollapsed ? 'sidebar-collapsed' : ''} min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-[#0B1329] dark:text-white`}>
       <aside className={`app-sidebar ${mobileNavOpen ? 'mobile-open' : ''}`}>
-        <Link to="/projects" className="sidebar-brand" aria-label="Kanbot projects">
-          <img src={logo} alt="Kanbot" />
-        </Link>
+        <div className="sidebar-header">
+          <Link to="/projects" className="sidebar-brand" aria-label="Kanbot projects" onClick={() => setMobileNavOpen(false)}>
+            <img src={logo} alt="Kanbot" />
+          </Link>
+          <IconButton
+            className="sidebar-toggle-button"
+            onClick={toggleSidebar}
+            aria-label={sidebarCollapsed ? 'Open navigation' : 'Close navigation'}
+            aria-expanded={!sidebarCollapsed}
+          >
+            {sidebarCollapsed ? <MenuOutlinedIcon /> : <MenuOpenOutlinedIcon />}
+          </IconButton>
+          <IconButton className="sidebar-close-button" onClick={() => setMobileNavOpen(false)} aria-label="Close navigation">
+            <CloseOutlinedIcon />
+          </IconButton>
+        </div>
         <div className="sidebar-project-select">
           <FormControl fullWidth size="small">
             <Select
@@ -114,17 +141,21 @@ export default function AppShell() {
           {projectError && <Alert severity="error" className="sidebar-alert">{projectError}</Alert>}
         </div>
         <nav className="sidebar-nav" aria-label="Main navigation">
-          <span className="sidebar-section-label">{activeProject?.key || 'WORKSPACE'}</span>
-          <NavLink to={rootPath ? `${rootPath}/backlog` : '/projects'} className={({ isActive }) => `sidebar-link ${isActive && projectId ? 'active' : ''}`}>
-            <PlaylistAddCheckOutlinedIcon fontSize="small" /> <span>Backlog</span>
-          </NavLink>
-          <NavLink to={rootPath ? `${rootPath}/board` : '/projects'} className={({ isActive }) => `sidebar-link ${isActive && /\/board$/.test(location.pathname) ? 'active' : ''}`}>
-            <ViewKanbanOutlinedIcon fontSize="small" /> <span>Active sprint</span>
-          </NavLink>
-          <NavLink to={rootPath ? `${rootPath}/sprints` : '/projects'} className={({ isActive }) => `sidebar-link ${isActive && /\/sprints/.test(location.pathname) ? 'active' : ''}`}>
-            <HistoryOutlinedIcon fontSize="small" /> <span>Sprints</span>
-          </NavLink>
-          <NavLink to="/projects" className={({ isActive }) => `sidebar-link ${isActive && !projectId ? 'active' : ''}`}>
+          {projectId && <span className="sidebar-section-label">{activeProject?.key || 'WORKSPACE'}</span>}
+          {projectId && (
+            <>
+              <NavLink title="Backlog" to={`${rootPath}/backlog`} onClick={() => setMobileNavOpen(false)} className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                <PlaylistAddCheckOutlinedIcon fontSize="small" /> <span>Backlog</span>
+              </NavLink>
+              <NavLink title="Active sprint" to={`${rootPath}/board`} onClick={() => setMobileNavOpen(false)} className={({ isActive }) => `sidebar-link ${isActive && /\/board$/.test(location.pathname) ? 'active' : ''}`}>
+                <ViewKanbanOutlinedIcon fontSize="small" /> <span>Active sprint</span>
+              </NavLink>
+              <NavLink title="Sprints" to={`${rootPath}/sprints`} onClick={() => setMobileNavOpen(false)} className={({ isActive }) => `sidebar-link ${isActive && /\/sprints/.test(location.pathname) ? 'active' : ''}`}>
+                <HistoryOutlinedIcon fontSize="small" /> <span>Sprints</span>
+              </NavLink>
+            </>
+          )}
+          <NavLink title="Projects" to="/projects" onClick={() => setMobileNavOpen(false)} className={({ isActive }) => `sidebar-link ${isActive && !projectId ? 'active' : ''}`}>
             <FolderOutlinedIcon fontSize="small" /> <span>Projects</span>
           </NavLink>
         </nav>
@@ -141,8 +172,13 @@ export default function AppShell() {
       <div className="app-main">
         <header className="app-topbar">
           <div className="app-title-group">
-            <IconButton className="mobile-menu-button" onClick={() => setMobileNavOpen((open) => !open)} aria-label="Toggle navigation">
-              <MenuOutlinedIcon />
+            <IconButton
+              className="mobile-menu-button"
+              onClick={toggleSidebar}
+              aria-label={mobileNavOpen ? 'Close navigation' : 'Open navigation'}
+              aria-expanded={mobileNavOpen}
+            >
+              {mobileNavOpen ? <MenuOpenOutlinedIcon /> : <MenuOutlinedIcon />}
             </IconButton>
             <div>
               <Typography component="h1" variant="h6" fontWeight={700}>{routeTitle(location.pathname)}</Typography>

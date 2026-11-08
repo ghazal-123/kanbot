@@ -85,15 +85,16 @@ function AppRoutes() {
           <Route path="/register" element={<Register />} />
         </Route>
         <Route element={<ProtectedRoute />}>
+          <Route path="*" element={<NotFound />} />
           <Route element={<AppShell />}>
             <Route path="/" element={<Navigate to="/projects" replace />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/projects/:projectId" element={<Navigate to="backlog" replace />} />
+            <Route path="/projects/:projectId/projects" element={<Navigate to="/projects" replace />} />
             <Route path="/projects/:projectId/backlog" element={<Backlog />} />
             <Route path="/projects/:projectId/board" element={<ActiveSprint />} />
             <Route path="/projects/:projectId/sprints" element={<Sprints />} />
             <Route path="/projects/:projectId/sprints/:sprintId" element={<Sprints />} />
-            <Route path="*" element={<NotFound />} />
           </Route>
         </Route>
       </Routes>
