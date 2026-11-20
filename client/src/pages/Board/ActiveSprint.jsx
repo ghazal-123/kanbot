@@ -22,6 +22,7 @@ import { useNavigate, useParams } from 'react-router'
 import { api, getApiErrorMessage } from '../../api/client'
 import { fetchSprintBoard, fetchSprints, publishDataChange, useProjectRefresh } from '../../api/kanbot'
 import TodoEditorDialog from '../../components/TodoEditorDialog'
+import useThemeMode from '../../context/useThemeMode'
 
 const columns = [
   { id: 'todo', label: 'To Do' },
@@ -43,6 +44,7 @@ function daysRemaining(endDate) {
 export default function ActiveSprint() {
   const { projectId } = useParams()
   const navigate = useNavigate()
+  const { mode } = useThemeMode()
   const [sprints, setSprints] = useState([])
   const [sprint, setSprint] = useState(null)
   const [board, setBoard] = useState(Object.fromEntries(columns.map((column) => [column.id, []])))
@@ -209,7 +211,7 @@ export default function ActiveSprint() {
             </div>
             <div className="board-summary-actions">
               <Button startIcon={<AutoAwesomeOutlinedIcon />} onClick={() => window.dispatchEvent(new CustomEvent('kanbot:open-ai', { detail: { action: 'summarize' } }))} variant="outlined">Summarize</Button>
-              <Button color="error" onClick={() => { setMoveUnfinishedTo('backlog'); setCompleteOpen(true) }} variant="contained">Complete sprint</Button>
+              <Button color={mode === 'light' ? 'primary' : 'error'} onClick={() => { setMoveUnfinishedTo('backlog'); setCompleteOpen(true) }} variant="contained">Complete sprint</Button>
             </div>
           </section>
           <div className="kanban-board">
@@ -294,7 +296,7 @@ export default function ActiveSprint() {
         </DialogContent>
         <DialogActions>
           <Button disabled={busy} onClick={() => setCompleteOpen(false)}>Cancel</Button>
-          <Button color="error" disabled={busy} onClick={completeSprint} variant="contained">{busy ? 'Completing…' : 'Complete sprint'}</Button>
+          <Button color={mode === 'light' ? 'primary' : 'error'} disabled={busy} onClick={completeSprint} variant="contained">{busy ? 'Completing…' : 'Complete sprint'}</Button>
         </DialogActions>
       </Dialog>
 

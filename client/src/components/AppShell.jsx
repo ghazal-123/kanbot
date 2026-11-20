@@ -67,7 +67,10 @@ export default function AppShell() {
   }, [location.pathname])
 
   useEffect(() => {
-    const openAssistant = () => setAssistantOpen(true)
+    const openAssistant = (event) => {
+      const action = event.detail?.action
+      setAssistantOpen(action !== 'generate' && action !== 'plan')
+    }
     window.addEventListener('kanbot:open-ai', openAssistant)
     return () => window.removeEventListener('kanbot:open-ai', openAssistant)
   }, [])

@@ -680,6 +680,7 @@
   margin: 1rem 0 !important;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .project-card-stats {

@@ -326,7 +326,7 @@ export default function AiAssistant({ open, onClose, projectId, projectName }) {
         </form>
       </Drawer>
 
-      <Dialog open={dialog === 'generate'} onClose={() => !actionBusy && setDialog('')} fullWidth maxWidth="lg">
+      <Dialog open={dialog === 'generate'} onClose={() => !actionBusy && setDialog('')} fullWidth maxWidth="sm">
         <DialogTitle>Generate todos with AI</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
@@ -370,7 +370,7 @@ export default function AiAssistant({ open, onClose, projectId, projectName }) {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={dialog === 'plan'} onClose={() => !actionBusy && setDialog('')} fullWidth maxWidth="lg">
+      <Dialog open={dialog === 'plan'} onClose={() => !actionBusy && setDialog('')} fullWidth maxWidth="md">
         <DialogTitle>Plan a sprint with AI</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
